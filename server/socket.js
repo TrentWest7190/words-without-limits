@@ -44,10 +44,19 @@ const createSocket = (server) => {
     })
 
     socket.on('closeRoom', (roomCode, callback) => {
+      // Close room
       store.closeRoom(roomCode)
+
+      // Move client back to lobby
       socket.leave(roomCode).join('lobby')
+
+      // Update lobby with new rooms
       io.to('lobby').emit('updateRooms', store.rooms)
+
+      // Update clients still in room that it no longer exists
       io.to(roomCode).emit('roomClosed')
+
+      //
       callback()
     })
 
