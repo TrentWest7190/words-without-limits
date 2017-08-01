@@ -2,7 +2,7 @@ import randomstring from 'randomstring'
 
 let instance = null
 
-export default class store{
+export default class store {
   constructor () {
     if (!instance) {
       instance = this
@@ -23,5 +23,9 @@ export default class store{
     } while (this.rooms.includes(roomcode))
     this.rooms.push(roomcode)
     return roomcode
+  }
+
+  closeRoom (roomCode) {
+    this.rooms.splice(this.rooms.indexOf(roomCode), 1)
   }
 }

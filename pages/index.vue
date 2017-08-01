@@ -24,7 +24,7 @@ export default {
   },
 
   created () {
-    this.socket.on('roomStarted', (rooms) => {
+    this.socket.on('updateRooms', (rooms) => {
       this.rooms = rooms
     })
   },

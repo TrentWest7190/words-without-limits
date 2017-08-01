@@ -12,12 +12,15 @@ const createSocket = (server) => {
     socket.on('startRoom', (callback) => {
       const newRoomCode = store.createRoom()
       socket.leave('lobby').join(newRoomCode)
-      io.to('lobby').emit('roomStarted', store.rooms)
+      io.to('lobby').emit('updateRooms', store.rooms)
       callback(newRoomCode)
     })
 
-    socket.on('closeRoom', (roomCode) => {
-      console.log(roomCode)
+    socket.on('closeRoom', (roomCode, callback) => {
+      store.closeRoom(roomCode)
+      socket.leave(roomCode).join('lobby')
+      io.to('lobby').emit('updateRooms', store.rooms)
+      callback()
     })
   })
 }

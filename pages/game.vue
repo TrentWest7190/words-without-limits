@@ -19,7 +19,7 @@ export default {
   methods: {
     closeRoom () {
       this.socket.emit('closeRoom', this.roomCode, () => {
-        console.log('baba')
+        this.$router.push('/')
       })
     }
   }
