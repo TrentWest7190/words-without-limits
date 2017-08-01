@@ -1,7 +1,8 @@
 <template>
   <section class="container">
     <div>Welcome to room {{ roomCode }}</div>
-    <button v-on:click="closeRoom">disband room</button>
+    <button v-if="king" v-on:click="closeRoom">Disband Room</button>
+    <button v-else v-on:click="leaveRoom">Leave Room</button>
   </section>
 </template>
 
@@ -13,7 +14,7 @@ export default {
     if (!context.params.roomCode) {
       context.redirect('/')
     }
-    return { roomCode: context.params.roomCode }
+    return context.params
   },
 
   data () {
@@ -22,9 +23,22 @@ export default {
     }
   },
 
+  created () {
+    this.socket.on('roomClosed', () => {
+      this.$router.push('/')
+      alert('Room was disbanded!')
+    })
+  },
+
   methods: {
     closeRoom () {
       this.socket.emit('closeRoom', this.roomCode, () => {
+        this.$router.push('/')
+      })
+    },
+
+    leaveRoom () {
+      this.socket.emit('leaveRoom', this.roomCode, () => {
         this.$router.push('/')
       })
     }

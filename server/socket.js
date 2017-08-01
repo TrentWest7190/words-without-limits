@@ -16,10 +16,21 @@ const createSocket = (server) => {
       callback(newRoomCode)
     })
 
+    socket.on('joinRoom', (roomCode, callback) => {
+      socket.leave('lobby').join(roomCode)
+      callback()
+    })
+
     socket.on('closeRoom', (roomCode, callback) => {
       store.closeRoom(roomCode)
       socket.leave(roomCode).join('lobby')
       io.to('lobby').emit('updateRooms', store.rooms)
+      io.to(roomCode).emit('roomClosed')
+      callback()
+    })
+
+    socket.on('leaveRoom', (roomCode, callback) => {
+      socket.leave(roomCode).join('lobby')
       callback()
     })
   })

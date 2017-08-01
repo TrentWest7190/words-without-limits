@@ -1,6 +1,21 @@
 <template>
   <section class="container">
     <button v-on:click="startRoom">Start Room</button>
+    <label>
+      Name
+      <input
+        v-model="playerName"
+      >
+    </label>
+    <label>
+      Join Room
+      <input 
+        v-model="joinCode" 
+        v-on:keyup.enter="joinRoom" 
+        maxLength=4 
+        class="caps-input"
+      >
+    </label>
     <ul>
       <li v-for="room in rooms" :key="room">{{ room }}</li>
     </ul>
@@ -19,7 +34,9 @@ export default {
 
   data () {
     return {
-      socket
+      socket,
+      joinCode: '',
+      playerName: ''
     }
   },
 
@@ -31,32 +48,49 @@ export default {
 
   methods: {
     startRoom () {
-      this.socket.emit('startRoom', (roomCode) => {
-        this.$router.push({
-          name: 'game',
-          params: {
-            roomCode
-          }
+      if (this.playerName.length !== 0) {
+        this.socket.emit('startRoom', (roomCode) => {
+          this.$router.push({
+            name: 'game',
+            params: {
+              roomCode,
+              playerName: this.playerName,
+              king: true
+            }
+          })
         })
-      })
+      } else {
+        alert('Please enter a name!')
+      }
+    },
+
+    joinRoom () {
+      if (this.playerName.length !== 0) {
+        const upperCode = this.joinCode.toUpperCase()
+        if (this.rooms.includes(upperCode)) {
+          this.socket.emit('joinRoom', upperCode, () => {
+            this.$router.push({
+              name: 'game',
+              params: {
+                roomCode: upperCode,
+                playerName: this.playerName,
+                king: false
+              }
+            })
+          })
+        } else {
+          alert('Invalid room code!')
+        }
+      } else {
+        alert('Please enter a name!')
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.title
-{
-  margin: 30px 0;
-}
-.users
-{
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.user
-{
-  margin: 10px 0;
+.caps-input {
+  text-transform: uppercase
 }
 </style>
