@@ -31,7 +31,14 @@ export default {
 
   methods: {
     startRoom () {
-      this.socket.emit('startRoom')
+      this.socket.emit('startRoom', (roomCode) => {
+        this.$router.push({
+          name: 'game',
+          params: {
+            roomCode
+          }
+        })
+      })
     }
   }
 }
