@@ -60,6 +60,7 @@ export default {
             params: {
               roomCode: room.roomCode,
               playerName: this.playerName,
+              players: room.players,
               king: true
             }
           })
@@ -78,7 +79,8 @@ export default {
               name: 'game',
               params: {
                 roomCode: room.roomCode,
-                playerName: this.playerName
+                playerName: this.playerName,
+                players: room.players
               }
             })
           })

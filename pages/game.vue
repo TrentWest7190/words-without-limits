@@ -3,6 +3,9 @@
     <div>Welcome to room {{ roomCode }}</div>
     <button v-if="king" v-on:click="closeRoom">Disband Room</button>
     <button v-else v-on:click="leaveRoom">Leave Room</button>
+    <ul>
+      <li v-for="player in players" :key="player.socketid">{{ player.playerName }}</li>
+    </ul>
   </section>
 </template>
 

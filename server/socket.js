@@ -30,7 +30,7 @@ const createSocket = (server) => {
       // Add player to specified room
       store.addPlayerToRoom(playerName, socket.id, roomCode, false)
 
-      // Remove player from lobby, add them to new room created
+      // Move client from lobby to room
       socket.leave('lobby').join(roomCode)
 
       // Update everybody in the lobby with the new state of the rooms
@@ -52,7 +52,19 @@ const createSocket = (server) => {
     })
 
     socket.on('leaveRoom', (roomCode, callback) => {
+      // Remove player from room using socket id
+      store.removePlayerFromRoom(socket.id, roomCode)
+
+      // Move client back to lobby
       socket.leave(roomCode).join('lobby')
+
+      // Update lobby with new room info
+      io.to('lobby').emit('updateRooms', store.rooms)
+
+      // Update players still in room with new player info
+      io.to(roomCode).emit('updatePlayers', store.getRoomByCode(roomCode).players)
+
+      // cb
       callback()
     })
   })

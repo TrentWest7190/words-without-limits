@@ -45,6 +45,12 @@ export default class store {
     })
   }
 
+  removePlayerFromRoom (socketid, roomCode) {
+    let _room = this.getRoomByCode(roomCode)
+
+    _room.players = _room.players.filter((player) => player.socketid !== socketid)
+  }
+
   getRoomByCode (roomCode) {
     return this.rooms.find((room) => room.roomCode === roomCode)
   }
