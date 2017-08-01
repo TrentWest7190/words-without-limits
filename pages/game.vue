@@ -14,7 +14,12 @@ export default {
     if (!context.params.roomCode) {
       context.redirect('/')
     }
-    return context.params
+    return {
+      king: context.params.king,
+      roomCode: context.params.roomCode,
+      playerName: context.params.playerName,
+      players: context.params.players
+    }
   },
 
   data () {
@@ -28,6 +33,10 @@ export default {
     this.socket.on('roomClosed', () => {
       this.$router.push('/')
       alert('Room was disbanded!')
+    })
+
+    this.socket.on('updatePlayers', (players) => {
+      this.players = players
     })
   },
 

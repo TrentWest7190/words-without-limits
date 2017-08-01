@@ -10,18 +10,37 @@ const createSocket = (server) => {
     socket.join('lobby')
 
     socket.on('startRoom', (playerName, callback) => {
+      // Create new room
       const newRoomCode = store.createRoom()
+
+      // Add player who initialized room to room
       store.addPlayerToRoom(playerName, socket.id, newRoomCode, true)
+
+      // Remove player from lobby, add them to new room created
       socket.leave('lobby').join(newRoomCode)
+
+      // Update everybody in the lobby with the new state of the rooms
       io.to('lobby').emit('updateRooms', store.rooms)
-      callback(newRoomCode)
+
+      // Send back newly created room to client
+      callback(store.getRoomByCode(newRoomCode))
     })
 
     socket.on('joinRoom', (roomCode, playerName, callback) => {
+      // Add player to specified room
       store.addPlayerToRoom(playerName, socket.id, roomCode, false)
+
+      // Remove player from lobby, add them to new room created
       socket.leave('lobby').join(roomCode)
+
+      // Update everybody in the lobby with the new state of the rooms
       io.to('lobby').emit('updateRooms', store.rooms)
-      callback()
+
+      // Update everybody already in the room with the new state of the players
+      io.to(roomCode).emit('updatePlayers', store.getRoomByCode(roomCode).players)
+
+      // Send back room information to client
+      callback(store.getRoomByCode(roomCode))
     })
 
     socket.on('closeRoom', (roomCode, callback) => {

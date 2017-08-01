@@ -54,11 +54,11 @@ export default {
   methods: {
     startRoom () {
       if (this.playerName.length !== 0) {
-        this.socket.emit('startRoom', this.playerName, (roomCode) => {
+        this.socket.emit('startRoom', this.playerName, (room) => {
           this.$router.push({
             name: 'game',
             params: {
-              roomCode,
+              roomCode: room.roomCode,
               playerName: this.playerName,
               king: true
             }
@@ -73,11 +73,11 @@ export default {
       if (this.playerName.length !== 0) {
         const upperCode = this.joinCode.toUpperCase()
         if (this.rooms.find((room) => room.roomCode === upperCode)) {
-          this.socket.emit('joinRoom', upperCode, this.playerName, () => {
+          this.socket.emit('joinRoom', upperCode, this.playerName, (room) => {
             this.$router.push({
               name: 'game',
               params: {
-                roomCode: upperCode,
+                roomCode: room.roomCode,
                 playerName: this.playerName
               }
             })

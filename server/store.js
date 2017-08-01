@@ -21,10 +21,11 @@ export default class store {
         charset: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
       })
     } while (this.rooms.includes(roomCode))
-    this.rooms.push({
+    let newRoom = {
       roomCode,
       players: []
-    })
+    }
+    this.rooms.push(newRoom)
     return roomCode
   }
 
@@ -35,12 +36,16 @@ export default class store {
   }
 
   addPlayerToRoom (playerName, socketid, roomCode, king) {
-    this.rooms.find((room) => {
-      return room.roomCode === roomCode
-    }).players.push({
+    let _room = this.getRoomByCode(roomCode)
+
+    _room.players.push({
       playerName,
       socketid,
       king
     })
+  }
+
+  getRoomByCode (roomCode) {
+    return this.rooms.find((room) => room.roomCode === roomCode)
   }
 }
