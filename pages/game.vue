@@ -9,9 +9,15 @@
 import socket from '~/plugins/socket.io'
 
 export default {
+  asyncData (context) {
+    if (!context.params.roomCode) {
+      context.redirect('/')
+    }
+    return { roomCode: context.params.roomCode }
+  },
+
   data () {
     return {
-      roomCode: this.$route.params.roomCode,
       socket
     }
   },
