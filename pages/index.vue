@@ -17,7 +17,12 @@
       >
     </label>
     <ul>
-      <li v-for="room in rooms" :key="room">{{ room }}</li>
+      <li v-for="room in rooms" :key="room">
+        {{ room.roomCode }}
+        <ul v-for="player in room.players" :key="player.socketid">
+          <li>{{ player }}</li>
+        </ul>
+      </li>
     </ul>
   </section>
 </template>
@@ -49,7 +54,7 @@ export default {
   methods: {
     startRoom () {
       if (this.playerName.length !== 0) {
-        this.socket.emit('startRoom', (roomCode) => {
+        this.socket.emit('startRoom', this.playerName, (roomCode) => {
           this.$router.push({
             name: 'game',
             params: {
@@ -67,14 +72,13 @@ export default {
     joinRoom () {
       if (this.playerName.length !== 0) {
         const upperCode = this.joinCode.toUpperCase()
-        if (this.rooms.includes(upperCode)) {
-          this.socket.emit('joinRoom', upperCode, () => {
+        if (this.rooms.find((room) => room.roomCode === upperCode)) {
+          this.socket.emit('joinRoom', upperCode, this.playerName, () => {
             this.$router.push({
               name: 'game',
               params: {
                 roomCode: upperCode,
-                playerName: this.playerName,
-                king: false
+                playerName: this.playerName
               }
             })
           })

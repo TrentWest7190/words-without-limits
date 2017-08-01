@@ -9,15 +9,18 @@ const createSocket = (server) => {
   io.on('connection', (socket) => {
     socket.join('lobby')
 
-    socket.on('startRoom', (callback) => {
+    socket.on('startRoom', (playerName, callback) => {
       const newRoomCode = store.createRoom()
+      store.addPlayerToRoom(playerName, socket.id, newRoomCode, true)
       socket.leave('lobby').join(newRoomCode)
       io.to('lobby').emit('updateRooms', store.rooms)
       callback(newRoomCode)
     })
 
-    socket.on('joinRoom', (roomCode, callback) => {
+    socket.on('joinRoom', (roomCode, playerName, callback) => {
+      store.addPlayerToRoom(playerName, socket.id, roomCode, false)
       socket.leave('lobby').join(roomCode)
+      io.to('lobby').emit('updateRooms', store.rooms)
       callback()
     })
 

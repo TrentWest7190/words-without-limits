@@ -19,6 +19,7 @@ export default {
 
   data () {
     return {
+      king: false,
       socket
     }
   },

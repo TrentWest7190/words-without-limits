@@ -14,18 +14,33 @@ export default class store {
   }
 
   createRoom () {
-    let roomcode = ''
+    let roomCode = ''
     do {
-      roomcode = randomstring.generate({
+      roomCode = randomstring.generate({
         length: 4,
         charset: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
       })
-    } while (this.rooms.includes(roomcode))
-    this.rooms.push(roomcode)
-    return roomcode
+    } while (this.rooms.includes(roomCode))
+    this.rooms.push({
+      roomCode,
+      players: []
+    })
+    return roomCode
   }
 
   closeRoom (roomCode) {
-    this.rooms.splice(this.rooms.indexOf(roomCode), 1)
+    this.rooms = this.rooms.filter((room) => {
+      return room.roomCode !== roomCode
+    })
+  }
+
+  addPlayerToRoom (playerName, socketid, roomCode, king) {
+    this.rooms.find((room) => {
+      return room.roomCode === roomCode
+    }).players.push({
+      playerName,
+      socketid,
+      king
+    })
   }
 }
