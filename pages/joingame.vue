@@ -2,7 +2,7 @@
   <section class="container">
     <input v-model="playerName" placeholder="Enter a name for yourself">
     <input v-model="roomCode" placeholder="Enter the room code here">
-    <input v-model="password" placeholder="Enter a password, if the room has one">
+    <input v-model="password" placeholder="Enter a password, if the room has one" type="password">
     <button v-on:click="joinRoom">Join Game!</button>
   </section>
 </template>
@@ -28,7 +28,7 @@ export default {
         return
       }
 
-      const upperCode = this.joinCode.toUpperCase()
+      const upperCode = this.roomCode.toUpperCase()
       this.socket.emit('joinRoom', upperCode, this.playerName, this.password, (room) => {
         if (room === 0) {
           alert('Invalid room code!')
@@ -65,6 +65,7 @@ section {
 
 input {
   font-size: 22px;
+  text-transform: uppercase;
 }
 
 button {
