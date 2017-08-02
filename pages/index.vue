@@ -17,7 +17,7 @@
       >
     </label>
     <ul>
-      <li v-for="room in rooms" :key="room">
+      <li v-for="room in rooms" :key="room.roomCode">
         {{ room.roomCode }}
         <ul v-for="player in room.players" :key="player.socketid">
           <li>{{ player }}</li>
@@ -30,9 +30,10 @@
 <script>
 import socket from '~/plugins/socket.io'
 import axios from '~/plugins/axios'
+import Cookies from '~/plugins/js-cookie'
 
 export default {
-  async asyncData () {
+  async asyncData (context) {
     let { data } = await axios.get('/api/rooms')
     return { rooms: data }
   },
@@ -42,6 +43,16 @@ export default {
       socket,
       joinCode: '',
       playerName: ''
+    }
+  },
+
+  beforeCreate () {
+    const roomParams = Cookies.getJSON('roomParams')
+    if (roomParams) {
+      this.$router.replace({
+        name: 'game',
+        params: roomParams
+      })
     }
   },
 
@@ -55,14 +66,16 @@ export default {
     startRoom () {
       if (this.playerName.length !== 0) {
         this.socket.emit('startRoom', this.playerName, (room) => {
+          const params = {
+            roomCode: room.roomCode,
+            playerName: this.playerName,
+            players: room.players,
+            king: true
+          }
+          Cookies.set('roomParams', params)
           this.$router.push({
             name: 'game',
-            params: {
-              roomCode: room.roomCode,
-              playerName: this.playerName,
-              players: room.players,
-              king: true
-            }
+            params
           })
         })
       } else {
@@ -75,13 +88,15 @@ export default {
         const upperCode = this.joinCode.toUpperCase()
         if (this.rooms.find((room) => room.roomCode === upperCode)) {
           this.socket.emit('joinRoom', upperCode, this.playerName, (room) => {
+            const params = {
+              roomCode: room.roomCode,
+              playerName: this.playerName,
+              players: room.players
+            }
+            Cookies.set('roomParams', params)
             this.$router.push({
               name: 'game',
-              params: {
-                roomCode: room.roomCode,
-                playerName: this.playerName,
-                players: room.players
-              }
+              params
             })
           })
         } else {

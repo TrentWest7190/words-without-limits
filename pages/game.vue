@@ -11,6 +11,7 @@
 
 <script>
 import socket from '~/plugins/socket.io'
+import Cookies from '~/plugins/js-cookie'
 
 export default {
   asyncData (context) {
@@ -45,12 +46,14 @@ export default {
 
   methods: {
     closeRoom () {
+      Cookies.remove('roomParams')
       this.socket.emit('closeRoom', this.roomCode, () => {
         this.$router.push('/')
       })
     },
 
     leaveRoom () {
+      Cookies.remove('roomParams')
       this.socket.emit('leaveRoom', this.roomCode, () => {
         this.$router.push('/')
       })
