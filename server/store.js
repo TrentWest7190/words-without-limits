@@ -57,4 +57,10 @@ export default class store {
   getRoomByCode (roomCode) {
     return this.rooms.find((room) => room.roomCode === roomCode)
   }
+
+  findPlayerRoom (socketid) {
+    return this.rooms.find((room) => {
+      return room.players.find((player) => player.socketid === socketid) !== undefined
+    })
+  }
 }

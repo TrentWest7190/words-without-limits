@@ -21,28 +21,14 @@ import Cookies from '~/plugins/js-cookie'
 
 export default {
   async asyncData (context) {
-    const roomCode = context.isClient ? Cookies.get('roomCode') : context.req.cookies.roomCode
-    const king = context.isClient ? Cookies.get('king') : context.req.cookies.king
-    if (!roomCode) {
-      context.redirect('/')
-    }
-    const { data } = await axios.get('/api/rooms/' + roomCode)
+    const { data } = await axios.get('/api/rooms?socketid=' + socket.id)
+
     if (data) {
       return {
         players: data.players,
-        roomCode,
-        king
+        roomCode: data.roomCode
       }
     } else {
-      if (context.isClient) {
-        Cookies.remove('roomCode')
-        Cookies.remove('king')
-        Cookies.set('roomDisconnected', true)
-      } else {
-        context.res.clearCookie('roomCode')
-        context.res.clearCookie('king')
-        context.res.cookie('roomDisconnected', true)
-      }
       context.redirect('/')
     }
   },
@@ -71,6 +57,10 @@ export default {
 
     this.socket.on('updatePlayers', (players) => {
       this.players = players
+    })
+
+    this.socket.on('reconnect', () => {
+      console.log('I am reconnecting')
     })
   },
 

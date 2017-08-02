@@ -29,6 +29,19 @@ const createSocket = (server) => {
       callback(newRoomCode)
     })
 
+    socket.on('reconnect', (callback) => {
+      const _room = store.findPlayerRoom(socket.id)
+      if (_room) {
+        callback(_room)
+      } else {
+        socket.rooms.forEach((room) => socket.leave(room))
+
+        socket.join('lobby')
+
+        callback(ROOM_NOT_FOUND_ERROR)
+      }
+    })
+
     socket.on('joinRoom', (roomCode, playerName, password, callback) => {
       let _room = store.getRoomByCode(roomCode)
 

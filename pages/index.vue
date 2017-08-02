@@ -10,23 +10,15 @@
 </template>
 
 <script>
-import Cookies from '~/plugins/js-cookie'
+import axios from '~/plugins/axios'
+import socket from '~/plugins/socket.io'
 
 export default {
   async asyncData (context) {
-    const roomCode = context.isClient ? Cookies.get('roomCode') : context.req.cookies.roomCode
-    const roomDisconnected = context.isClient ? Cookies.get('roomDisconnected') : context.req.cookies.roomDisconnected
+    const playerRoomData = await axios.get('/api/rooms?socketid=' + socket.id).data
 
-    if (roomCode) {
+    if (playerRoomData) {
       context.redirect('game')
-    }
-
-    if (roomDisconnected) {
-      context.isClient ? Cookies.remove('roomDisconnected') : context.res.clearCookie('roomDisconnected')
-    }
-
-    return {
-      roomDisconnected
     }
   },
 
