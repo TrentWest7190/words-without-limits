@@ -3,8 +3,8 @@ import Store from './store'
 
 let store = new Store()
 
-const ROOM_NOT_FOUND_ERROR = 0;
-const PASSWORD_INCORRECT_ERROR = 1;
+const ROOM_NOT_FOUND_ERROR = 0
+const PASSWORD_INCORRECT_ERROR = 1
 
 const createSocket = (server) => {
   const io = SocketIO(server)
@@ -33,7 +33,7 @@ const createSocket = (server) => {
       let _room = store.getRoomByCode(roomCode)
 
       if (_room === undefined) {
-        callback(0)
+        callback(ROOM_NOT_FOUND_ERROR)
         return
       }
       if (!_room.password || _room.password === password) {
@@ -52,7 +52,7 @@ const createSocket = (server) => {
         // Send back room information to client
         callback(roomCode)
       } else {
-        callback(1)
+        callback(PASSWORD_INCORRECT_ERROR)
       }
     })
 
