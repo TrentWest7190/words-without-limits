@@ -13,7 +13,7 @@ export default class store {
     return instance
   }
 
-  createRoom () {
+  createRoom (password) {
     let roomCode = ''
     do {
       roomCode = randomstring.generate({
@@ -24,6 +24,9 @@ export default class store {
     let newRoom = {
       roomCode,
       players: []
+    }
+    if (password.length > 0) {
+      newRoom.password = password
     }
     this.rooms.push(newRoom)
     return roomCode

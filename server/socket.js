@@ -3,15 +3,18 @@ import Store from './store'
 
 let store = new Store()
 
+const ROOM_NOT_FOUND_ERROR = 0;
+const PASSWORD_INCORRECT_ERROR = 1;
+
 const createSocket = (server) => {
   const io = SocketIO(server)
 
   io.on('connection', (socket) => {
     socket.join('lobby')
 
-    socket.on('startRoom', (playerName, callback) => {
+    socket.on('startRoom', (playerName, password, callback) => {
       // Create new room
-      const newRoomCode = store.createRoom()
+      const newRoomCode = store.createRoom(password)
 
       // Add player who initialized room to room
       store.addPlayerToRoom(playerName, socket.id, newRoomCode, true)
@@ -26,21 +29,31 @@ const createSocket = (server) => {
       callback(store.getRoomByCode(newRoomCode))
     })
 
-    socket.on('joinRoom', (roomCode, playerName, callback) => {
-      // Add player to specified room
-      store.addPlayerToRoom(playerName, socket.id, roomCode, false)
+    socket.on('joinRoom', (roomCode, playerName, password, callback) => {
+      let _room = store.getRoomByCode(roomCode)
 
-      // Move client from lobby to room
-      socket.leave('lobby').join(roomCode)
+      if (_room === undefined) {
+        callback(0)
+        return
+      }
+      if (!_room.password || _room.password === password) {
+        // Add player to specified room
+        store.addPlayerToRoom(playerName, socket.id, roomCode, false)
 
-      // Update everybody in the lobby with the new state of the rooms
-      io.to('lobby').emit('updateRooms', store.rooms)
+        // Move client from lobby to room
+        socket.leave('lobby').join(roomCode)
 
-      // Update everybody already in the room with the new state of the players
-      io.to(roomCode).emit('updatePlayers', store.getRoomByCode(roomCode).players)
+        // Update everybody in the lobby with the new state of the rooms
+        io.to('lobby').emit('updateRooms', store.rooms)
 
-      // Send back room information to client
-      callback(store.getRoomByCode(roomCode))
+        // Update everybody already in the room with the new state of the players
+        io.to(roomCode).emit('updatePlayers', store.getRoomByCode(roomCode).players)
+
+        // Send back room information to client
+        callback(store.getRoomByCode(roomCode))
+      } else {
+        callback(0)
+      }
     })
 
     socket.on('closeRoom', (roomCode, callback) => {
