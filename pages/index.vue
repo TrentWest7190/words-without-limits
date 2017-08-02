@@ -13,10 +13,27 @@
 import Cookies from '~/plugins/js-cookie'
 
 export default {
-  asyncData (context) {
+  async asyncData (context) {
+    console.log(context)
     const roomCode = context.isClient ? Cookies.get('roomCode') : context.req.cookies.roomCode
+    const roomDisconnected = context.isClient ? Cookies.get('roomDisconnected') : context.req.cookies.roomDisconnected
+
     if (roomCode) {
       context.redirect('game')
+    }
+
+    if (roomDisconnected) {
+      context.isClient ? Cookies.remove('roomDisconnected') : context.res.clearCookie('roomDisconnected')
+    }
+
+    return {
+      roomDisconnected
+    }
+  },
+
+  mounted () {
+    if (this.roomDisconnected) {
+      alert('The room you were in no longer exists!')
     }
   },
 

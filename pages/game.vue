@@ -23,10 +23,23 @@ export default {
       context.redirect('/')
     }
     const { data } = await axios.get('/api/rooms/' + roomCode)
-    return {
-      players: data.players,
-      roomCode,
-      king
+    if (data) {
+      return {
+        players: data.players,
+        roomCode,
+        king
+      }
+    } else {
+      if (context.isClient) {
+        Cookies.remove('roomCode')
+        Cookies.remove('king')
+        Cookies.set('roomDisconnected', true)
+      } else {
+        context.res.clearCookie('roomCode')
+        context.res.clearCookie('king')
+        context.res.cookie('roomDisconnected', true)
+      }
+      context.redirect('/')
     }
   },
 

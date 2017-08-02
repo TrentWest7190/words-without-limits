@@ -52,6 +52,7 @@ section {
 
 input {
   font-size: 22px;
+  text-transform: uppercase;
 }
 
 button {
