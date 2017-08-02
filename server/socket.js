@@ -47,10 +47,10 @@ const createSocket = (server) => {
         io.to('lobby').emit('updateRooms', store.rooms)
 
         // Update everybody already in the room with the new state of the players
-        io.to(roomCode).emit('updatePlayers', store.getRoomByCode(roomCode).players)
+        io.to(roomCode).emit('updatePlayers', _room.players)
 
         // Send back room information to client
-        callback(store.getRoomByCode(roomCode))
+        callback(_room)
       } else {
         callback(0)
       }
