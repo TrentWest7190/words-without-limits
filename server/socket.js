@@ -52,7 +52,7 @@ const createSocket = (server) => {
         // Send back room information to client
         callback(roomCode)
       } else {
-        callback(0)
+        callback(1)
       }
     })
 
