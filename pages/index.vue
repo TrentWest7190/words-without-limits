@@ -14,7 +14,6 @@ import Cookies from '~/plugins/js-cookie'
 
 export default {
   async asyncData (context) {
-    console.log(context)
     const roomCode = context.isClient ? Cookies.get('roomCode') : context.req.cookies.roomCode
     const roomDisconnected = context.isClient ? Cookies.get('roomDisconnected') : context.req.cookies.roomDisconnected
 
