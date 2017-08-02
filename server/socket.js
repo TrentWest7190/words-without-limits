@@ -89,6 +89,10 @@ const createSocket = (server) => {
       // cb
       callback()
     })
+
+    socket.on('kickPlayer', (socketid) => {
+      socket.to(socketid).emit('kicked')
+    })
   })
 }
 

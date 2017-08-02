@@ -4,8 +4,12 @@
     <button v-if="king" v-on:click="closeRoom">Disband Room</button>
     <button v-else v-on:click="leaveRoom">Leave Room</button>
     <span>Invite your friends with this link: https://words-without-limits.fun/joingame?roomCode={{ roomCode }}</span>
+    <span>Players:</span>
     <ul>
-      <li v-for="player in players" :key="player.socketid">{{ player.playerName }}</li>
+      <li v-for="player in players" :key="player.socketid">
+        {{ player.playerName }}
+        <button v-if="king && !player.king" v-on:click="kickPlayer(player.socketid)">X</button>
+      </li>
     </ul>
   </section>
 </template>
@@ -46,6 +50,8 @@ export default {
   data () {
     return {
       king: false,
+      players: [],
+      roomCode: '',
       socket
     }
   },
@@ -53,7 +59,14 @@ export default {
   created () {
     this.socket.on('roomClosed', () => {
       this.$router.push('/')
+      Cookies.remove('roomCode')
+      Cookies.remove('king')
       alert('Room was disbanded!')
+    })
+
+    this.socket.on('kicked', () => {
+      alert('Kicked from room!')
+      this.leaveRoom()
     })
 
     this.socket.on('updatePlayers', (players) => {
@@ -76,6 +89,10 @@ export default {
       this.socket.emit('leaveRoom', this.roomCode, () => {
         this.$router.push('/')
       })
+    },
+
+    kickPlayer (socketid) {
+      this.socket.emit('kickPlayer', socketid)
     }
   }
 }
