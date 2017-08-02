@@ -15,7 +15,7 @@ export default {
   data () {
     return {
       playerName: '',
-      roomCode: '',
+      roomCode: this.$route.query.roomCode || '',
       password: '',
       socket
     }
@@ -29,23 +29,19 @@ export default {
       }
 
       const upperCode = this.roomCode.toUpperCase()
-      this.socket.emit('joinRoom', upperCode, this.playerName, this.password, (room) => {
-        if (room === 0) {
+      this.socket.emit('joinRoom', upperCode, this.playerName, this.password, (roomCode) => {
+        if (roomCode === 0) {
           alert('Invalid room code!')
-        } else if (room === 1) {
+        } else if (roomCode === 1) {
           alert('Incorrect password!')
         } else {
-          const params = {
-            roomCode: room.roomCode,
-            playerName: this.playerName,
-            players: room.players
-          }
-
-          Cookies.set('roomParams', params)
+          Cookies.set('roomCode', roomCode)
 
           this.$router.push({
             name: 'game',
-            params
+            params: {
+              roomCode
+            }
           })
         }
       })

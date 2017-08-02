@@ -26,7 +26,7 @@ const createSocket = (server) => {
       io.to('lobby').emit('updateRooms', store.rooms)
 
       // Send back newly created room to client
-      callback(store.getRoomByCode(newRoomCode))
+      callback(newRoomCode)
     })
 
     socket.on('joinRoom', (roomCode, playerName, password, callback) => {
@@ -50,7 +50,7 @@ const createSocket = (server) => {
         io.to(roomCode).emit('updatePlayers', _room.players)
 
         // Send back room information to client
-        callback(_room)
+        callback(roomCode)
       } else {
         callback(0)
       }

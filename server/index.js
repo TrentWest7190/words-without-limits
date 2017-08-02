@@ -2,6 +2,7 @@ import express from 'express'
 import { Nuxt, Builder } from 'nuxt'
 import http from 'http'
 import createSocket from './socket'
+import cookieParser from 'cookie-parser'
 
 import api from './api'
 
@@ -28,6 +29,7 @@ if (config.dev) {
 }
 
 // Give nuxt middleware to express
+app.use(cookieParser())
 app.use(nuxt.render)
 
 // Listen the server

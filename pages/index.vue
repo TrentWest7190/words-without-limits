@@ -10,7 +10,16 @@
 </template>
 
 <script>
+import Cookies from '~/plugins/js-cookie'
+
 export default {
+  asyncData (context) {
+    const roomCode = context.isClient ? Cookies.get('roomCode') : context.req.cookies.roomCode
+    if (roomCode) {
+      context.redirect('game')
+    }
+  },
+
   methods: {
     nav (loc) {
       this.$router.push(loc)

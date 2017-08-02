@@ -26,17 +26,14 @@ export default {
         return
       }
 
-      this.socket.emit('startRoom', this.playerName, this.password, (room) => {
-        const params = {
-          roomCode: room.roomCode,
-          playerName: this.playerName,
-          players: room.players,
-          king: true
-        }
-        Cookies.set('roomParams', params)
+      this.socket.emit('startRoom', this.playerName, this.password, (roomCode) => {
+        Cookies.set('roomCode', roomCode)
+        Cookies.set('king', true)
         this.$router.push({
           name: 'game',
-          params
+          params: {
+            roomCode
+          }
         })
       })
     }

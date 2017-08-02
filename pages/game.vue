@@ -3,6 +3,7 @@
     <div>Welcome to room {{ roomCode }}</div>
     <button v-if="king" v-on:click="closeRoom">Disband Room</button>
     <button v-else v-on:click="leaveRoom">Leave Room</button>
+    <span>Invite your friends with this link: https://words-without-limits.fun/joingame?roomCode={{ roomCode }}</span>
     <ul>
       <li v-for="player in players" :key="player.socketid">{{ player.playerName }}</li>
     </ul>
@@ -11,18 +12,21 @@
 
 <script>
 import socket from '~/plugins/socket.io'
+import axios from '~/plugins/axios'
 import Cookies from '~/plugins/js-cookie'
 
 export default {
-  asyncData (context) {
-    if (!context.params.roomCode) {
+  async asyncData (context) {
+    const roomCode = context.isClient ? Cookies.get('roomCode') : context.req.cookies.roomCode
+    const king = context.isClient ? Cookies.get('king') : context.req.cookies.king
+    if (!roomCode) {
       context.redirect('/')
     }
+    const { data } = await axios.get('/api/rooms/' + roomCode)
     return {
-      king: context.params.king,
-      roomCode: context.params.roomCode,
-      playerName: context.params.playerName,
-      players: context.params.players
+      players: data.players,
+      roomCode,
+      king
     }
   },
 
@@ -46,14 +50,16 @@ export default {
 
   methods: {
     closeRoom () {
-      Cookies.remove('roomParams')
+      Cookies.remove('roomCode')
+      Cookies.remove('king')
       this.socket.emit('closeRoom', this.roomCode, () => {
         this.$router.push('/')
       })
     },
 
     leaveRoom () {
-      Cookies.remove('roomParams')
+      Cookies.remove('roomCode')
+      Cookies.remove('king')
       this.socket.emit('leaveRoom', this.roomCode, () => {
         this.$router.push('/')
       })
