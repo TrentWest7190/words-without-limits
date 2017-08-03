@@ -2,7 +2,7 @@
   "name": "words2",
   "version": "1.0.0",
   "description": "A Vue.js project",
-  "author": "Trent West <Trent.West@misys.com>",
+  "author": "Trent West",
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
