@@ -6,4 +6,9 @@ const host = process.env.HOST || '127.0.0.1'
 const port = process.env.PORT || 3000
 const server = http.createServer(app)
 server.listen(port, host)
+const io = require('socket.io')(server)
 console.log('Server listening on ' + host + ':' + port) // eslint-disable-line no-console
+
+io.on('connection', (socket) => {
+  console.log('Socket connected')
+})
