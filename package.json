@@ -16,7 +16,8 @@
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
   },
   "dependencies": {
-    "bulma": "^0.5.0",
+    "js-cookie": "^2.1.4",
+    "randomstring": "^1.1.5",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
     "vue": "^2.3.3",
