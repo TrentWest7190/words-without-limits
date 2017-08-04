@@ -19,14 +19,6 @@
 </template>
 
 <style lang="scss" scoped>
-header {
-  text-align: center;
-
-  h1 {
-    font-size: 90px;
-  }
-}
-
 .pure-u-1-2 {
   text-align: center;
   padding: 200px 0px;
