@@ -1,28 +1,38 @@
 <template>
-  <section>
-    <router-link to="/startgame" tag="div">
-      Start A New Game
-    </router-link>
-    <router-link to="/joingame" tag="div">
-      Join An Existing Game
-    </router-link>
-  </section>
+  <div class="container">
+    <header>
+      <h1>Words Without Limits!</h1>
+    </header>
+    <div class="pure-g">
+      <div class="pure-u-1-2">
+        <router-link class="button" to="/startgame">
+          Start A New Game
+        </router-link>
+      </div>
+      <div class="pure-u-1-2">
+        <router-link class="button" to="/joingame">
+          Join An Existing Game
+        </router-link>
+      </div>
+    </div>
+  </div>
 </template>
 
-<style scoped>
-section {
-  display: flex;
-  font-size: 40px;
+<style lang="scss" scoped>
+header {
+  text-align: center;
+
+  h1 {
+    font-size: 90px;
+  }
 }
 
-div {
-  width: 50%;
-  user-select: none;
-  cursor: pointer;
-  height: 20vh;
+.pure-u-1-2 {
+  text-align: center;
+  padding: 200px 0px;
 }
 
-div:hover {
-  background-color: red;
+.button {
+  font-size: 50px;
 }
 </style>

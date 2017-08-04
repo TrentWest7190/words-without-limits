@@ -1,7 +1,7 @@
 <template>
-  <div class="section" id="app">
+  <section id="app">
     <router-view></router-view>
-  </div>
+  </section>
 </template>
 
 <script>
@@ -9,6 +9,3 @@ export default {
   name: 'app'
 }
 </script>
-
-<style lang="sass" src="bulma">
-</style>
