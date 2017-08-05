@@ -46,10 +46,9 @@ export default {
   methods: {
     openLobby (playerName, password) {
       this.$socket.emit('openLobby', { playerName, password }, (lobbyCode) => {
-        this.$router.push(`/game/${lobbyCode}`, () => {
-          Cookies.set('playerID', this.$socket.id)
-          Cookies.set('lobbyID', lobbyCode)
-        })
+        Cookies.set('userID', this.$socket.id)
+        Cookies.set('lobbyCode', lobbyCode)
+        this.$router.push(`/game/${lobbyCode}`)
       })
     }
   }

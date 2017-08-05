@@ -4,6 +4,8 @@ module.exports = {
   lobbies: [],
 
   players: [],
+
+  userToSocketMap: {},
   
   openLobby (password) {
     let lobbyCode = ''
@@ -35,11 +37,52 @@ module.exports = {
     return this.lobbies.find((lobby) => lobby.lobbyCode === lobbyCode)
   },
 
+  getLobbyByPlayerID (userID) {
+    const player = this.getPlayerByID(userID)
+    return this.getLobbyByCode(player.lobbyCode)
+  },
+
+  getPlayersByCode (lobbyCode) {
+    return this.players.filter((player) => player.lobbyCode === lobbyCode)
+  },
+
+  getPlayerByID (userID) {
+    return this.players.find((player) => player.userID === userID)
+  },
+
+  getPlayerBySocket (socketID) {
+    return this.userToSocketMap[socketID]
+  },
+
   addPlayerToLobby (playerName, userID, lobbyCode) {
     this.players.push({
       playerName,
       userID,
-      lobbyCode
+      lobbyCode,
+      king: false,
+      disconnected: false
     })
+
+    this.updateUserToSocketMap(userID, userID)
+  },
+
+  updateUserToSocketMap (userID, socketID) {
+    this.userToSocketMap[userID] = socketID
+  },
+
+  transferKingship (lobbyCode, userID) {
+    let players = this.getPlayersByCode(lobbyCode)
+    players.forEach((player) => player.king = false)
+    this.getPlayerByID(userID).king = true
+  },
+
+  setPlayerAsDisconnected (userID) {
+    let player = this.getPlayerByID(userID)
+    player.disconnected = true
+  },
+
+  setPlayerAsConnected (userID) {
+    let player = this.getPlayerByID(userID)
+    player.disconnected = false
   }
 }

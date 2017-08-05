@@ -18,7 +18,39 @@ io.on('connection', (socket) => {
     const lobbyCode = store.openLobby()
 
     store.addPlayerToLobby(playerName, socket.id, lobbyCode)
+    store.transferKingship(lobbyCode, socket.id)
     
     callback(lobbyCode)
+  })
+
+  socket.on('getLobbyInfo', (lobbyCode, callback) => {
+    const lobby = store.getLobbyByCode(lobbyCode)
+    const players = store.getPlayersByCode(lobbyCode)
+
+    callback({ lobby, players })
+  })
+
+  socket.on('disconnecting', () => {
+    if (store.getPlayerBySocket(socket.id)) {
+      const userID = store.userToSocketMap[socket.id]
+
+      store.setPlayerAsDisconnected(userID)
+
+      const lobbyCode = store.getPlayerByID(userID).lobbyCode
+      const players = store.getPlayersByCode(lobbyCode)
+
+      socket.in(lobbyCode).emit('updatePlayers', players)
+    }
+  })
+
+  socket.on('reconnectToLobby', ({ lobbyCode, userID }, callback) => {
+    const lobby = store.getLobbyByCode(lobbyCode)
+    if (!lobby) {
+      return callback(true)
+    }
+    store.updateUserToSocketMap(userID, socket.id)
+    store.setPlayerAsConnected(userID)
+
+    return callback(false)
   })
 })

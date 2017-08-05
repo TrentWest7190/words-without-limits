@@ -8,6 +8,7 @@ export default {
     socket.on('connect', () => {
       console.log(`Socket connected to ${uri}`)
     })
+
     Vue.prototype.$socket = socket
   }
 }
