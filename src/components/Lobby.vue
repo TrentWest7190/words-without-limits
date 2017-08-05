@@ -48,6 +48,16 @@ export default {
     } else {
       next()
     }
+  },
+
+  beforeRouteLeave (to, from, next) {
+    if (confirm('Are you sure you want to leave?')) {
+      Cookies.remove('lobbyCode')
+      Cookies.remove('userID')
+      next()
+    } else {
+      next(false)
+    }
   }
 }
 </script>
