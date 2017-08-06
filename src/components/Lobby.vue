@@ -13,6 +13,7 @@
         </li>
       </ul>
     </div>
+    <button class="leave-button" @click="leaveLobby()">Leave Lobby</button>
   </div>
 </template>
 
@@ -103,5 +104,13 @@ export default {
     color: gray;
     text-decoration: line-through;
   }
+}
+
+.leave-button {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 50px;
+
 }
 </style>
