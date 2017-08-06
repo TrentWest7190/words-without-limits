@@ -15,8 +15,13 @@ export default {
     const userID = Cookies.get('userID')
     if (lobbyCode && userID) {
       this.$socket.emit('reconnectToLobby', { lobbyCode, userID }, (error) => {
-        if (error) {
+        if (error === 'LOBBY_NONEXISTENT') {
           alert('Room no longer exists!')
+          Cookies.remove('lobbyCode')
+          Cookies.remove('userID')
+          this.$router.replace('/')
+        } else if (error === 'PLAYER_REMOVED') {
+          alert('You were kicked from the room!')
           Cookies.remove('lobbyCode')
           Cookies.remove('userID')
           this.$router.replace('/')

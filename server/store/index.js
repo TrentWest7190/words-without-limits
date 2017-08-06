@@ -50,8 +50,16 @@ module.exports = {
     return this.players.find((player) => player.userID === userID)
   },
 
+  getUserIDBySocket (socketID) {
+    return Object.keys(this.userToSocketMap).find((userID) => this.userToSocketMap[userID] === socketID)
+  },
+
+  getSocketByUserID (userID) {
+    return this.userToSocketMap[userID]
+  },
+
   getPlayerBySocket (socketID) {
-    return this.userToSocketMap[socketID]
+    return this.getPlayerByID(this.getUserIDBySocket(socketID))
   },
 
   addPlayerToLobby (playerName, userID, lobbyCode) {
@@ -64,6 +72,12 @@ module.exports = {
     })
 
     this.updateUserToSocketMap(userID, userID)
+  },
+
+  removePlayerFromLobby (userID) {
+    this.players = this.players.filter((player) => player.userID !== userID)
+
+    delete this.userToSocketMap[userID]
   },
 
   updateUserToSocketMap (userID, socketID) {
@@ -84,5 +98,10 @@ module.exports = {
   setPlayerAsConnected (userID) {
     let player = this.getPlayerByID(userID)
     player.disconnected = false
+  },
+
+  checkLobbyPassword (lobbyCode, password) {
+    let lobby = this.getLobbyByCode(lobbyCode)
+    return lobby.password === password
   }
 }

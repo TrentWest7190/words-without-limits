@@ -5,10 +5,11 @@
     </header>
     <div class="pure-g">
       <ul class="pure-u-1-2">
-        <li v-for="player in players" :key="player.userID">
-          <span :class="player.king ? 'king' : ''">
-            {{ `${player.playerName}${player.king ? "(King)" : ""}`}}
+        <li class="pure-g" v-for="player in players" :key="player.userID">
+          <span :class="'pure-u-1-2 ' + getTextClass(player)">
+            {{ `${player.playerName}${player.king ? "(King)" : ""}${player.disconnected ? "(Disconnected)" : ""}`}}
           </span>
+          <button v-if="king && !player.king" class="pure-u-1-2" @click="kickPlayer(player)">Kick</button>
         </li>
       </ul>
     </div>
@@ -21,8 +22,9 @@ import Cookies from 'js-cookie'
 export default {
   data () {
     return {
-      code: this.$route.params.lobbyCode,
-      players: []
+      lobbyCode: this.$route.params.lobbyCode,
+      players: [],
+      king: false
     }
   },
 
@@ -30,14 +32,46 @@ export default {
     this.fetchLobbyInfo()
 
     this.$socket.on('updatePlayers', (players) => {
+      console.log(this)
       this.players = players
     })
+
+    this.$socket.on('kicked', () => {
+      alert('You were kicked from the room!')
+      this.leaveLobby()
+    })
+  },
+
+  beforeDestroy () {
+    this.$socket.removeListener('updatePlayers')
+    this.$socket.removeListener('kicked')
   },
 
   methods: {
     fetchLobbyInfo () {
       this.$socket.emit('getLobbyInfo', this.$route.params.lobbyCode, ({ lobby, players }) => {
         this.players = players
+        this.king = players.find((player) => player.king).userID === Cookies.get('userID')
+      })
+    },
+
+    getTextClass (player) {
+      if (player.king) {
+        return 'king'
+      } else if (player.disconnected) {
+        return 'disconnected'
+      }
+    },
+
+    kickPlayer (player) {
+      this.$socket.emit('kickPlayer', player.userID)
+    },
+
+    leaveLobby () {
+      Cookies.remove('lobbyCode')
+      Cookies.remove('userID')
+      this.$socket.emit('leaveLobby', this.lobbyCode, () => {
+        this.$router.replace('/')
       })
     }
   },
@@ -48,26 +82,12 @@ export default {
     } else {
       next()
     }
-  },
-
-  beforeRouteLeave (to, from, next) {
-    if (confirm('Are you sure you want to leave?')) {
-      Cookies.remove('lobbyCode')
-      Cookies.remove('userID')
-      next()
-    } else {
-      next(false)
-    }
   }
 }
 </script>
 
 
 <style lang="scss" scoped>
-.pure-g {
-  justify-content: center;
-}
-
 .pure-u-1-2 {
   li {
     text-align: center;
@@ -77,6 +97,11 @@ export default {
 
   .king {
     color: gold;
+  }
+
+  .disconnected {
+    color: gray;
+    text-decoration: line-through;
   }
 }
 </style>

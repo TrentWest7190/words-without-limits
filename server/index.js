@@ -19,6 +19,8 @@ io.on('connection', (socket) => {
 
     store.addPlayerToLobby(playerName, socket.id, lobbyCode)
     store.transferKingship(lobbyCode, socket.id)
+
+    socket.join(lobbyCode)
     
     callback(lobbyCode)
   })
@@ -31,15 +33,14 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnecting', () => {
-    if (store.getPlayerBySocket(socket.id)) {
-      const userID = store.userToSocketMap[socket.id]
-
+    const userID = store.getUserIDBySocket(socket.id)
+    if (userID) {
       store.setPlayerAsDisconnected(userID)
 
       const lobbyCode = store.getPlayerByID(userID).lobbyCode
       const players = store.getPlayersByCode(lobbyCode)
 
-      socket.in(lobbyCode).emit('updatePlayers', players)
+      socket.to(lobbyCode).emit('updatePlayers', players)
     }
   })
 
@@ -51,6 +52,43 @@ io.on('connection', (socket) => {
     store.updateUserToSocketMap(userID, socket.id)
     store.setPlayerAsConnected(userID)
 
+    socket.join(lobbyCode)
+    socket.to(lobbyCode).emit('updatePlayers', store.getPlayersByCode(lobbyCode))
+
     return callback(false)
+  })
+
+  socket.on('joinLobby', ({ lobbyCode, playerName, password }, callback) => {
+    const lobby = store.getLobbyByCode(lobbyCode)
+    if (!lobby) {
+      return callback('LOBBY_NONEXISTENT')
+    }
+
+    if (lobby.password && !store.checkLobbyPassword(lobbyCode, password)) {
+      return callback('INCORRECT_PASSWORD')
+    }
+
+    store.addPlayerToLobby(playerName, socket.id, lobbyCode)
+
+    socket.join(lobbyCode)
+
+    socket.to(lobbyCode).emit('updatePlayers', store.getPlayersByCode(lobbyCode))
+
+    return callback()
+  })
+
+  socket.on('kickPlayer', (userID) => {
+    io.to(store.getSocketByUserID(userID)).emit('kicked')
+  })
+
+  socket.on('leaveLobby', (lobbyCode, callback) => {
+    const userID = store.getUserIDBySocket(socket.id)
+
+    store.removePlayerFromLobby(userID)
+
+    socket.leave(lobbyCode)
+    socket.to(lobbyCode).emit('updatePlayers', store.getPlayersByCode(lobbyCode))
+
+    return callback()
   })
 })
